@@ -1,41 +1,43 @@
-var http = require("https");
-var cheerio = require("cheerio");
+var http = require("http");
 var fs = require("fs");
-var url = "https://shop120569397.taobao.com/";
-
-http.get(url, function(res) {
-    var html = "";
-    res.on("data", function(data) {
-        html += data;
-    }).on("end", function() {
-        var goods = filterGoods(html);
-        printGoodsInfo(goods);
-    })
-}).on("error", function() {
-    console.log("get goods error!");
-});
-
-function filterGoods(html) {
-    var $ = cheerio.load(html);
-    var str = [],
-        images = $('img');
-    images.each(function(index, el) {
-        var src = $(el).attr("src");
-        if (src.indexOf(".gif") === -1) {
-            if (src.indexOf("https:") === -1) {
-                str.push("https:" + src);
-            }
-        }
-    });
-    return str;
+var superagent = require('superagent');
+var cheerio = require("cheerio");
+var async = require('async'); //可控制并发数量
+var iconv = require('iconv-lite');
+var urls = [];
+// var eventproxy = require('eventproxy');
+// var ep = new eventproxy();
+var results = [];
+for (var i = 100001, max = 100001; i <= max; i++) {
+    urls.push('http://item.jd.com/' + i + '.html');
 }
-
-function printGoodsInfo(goods) {
-    var filename = "fyy-taobao.txt";
-    fs.writeFile(filename, "");
-    goods.forEach(function(item, index) {
-        fs.appendFile(filename, item + "\n", function(err) {
-            if (err) throw err;
+async.mapLimit(urls, 10, function(url, callback) {
+    superagent.get(url).end(function(err, res) {
+        var html = iconv.decode(res.text || '', 'gbk');
+        console.log(html)
+        var goods = filterGoods(url, html);
+        results.push(goods);
+        callback();
+    });
+}, function(err, result) {
+    if (err) {
+        throw err;
+    }
+    results.forEach(function(item, index) {
+        var content = (index + 1) + ' url:' + item.url + '#name:' + item.name + '\n';
+        fs.appendFile('jd_good_name.txt', content, function(err) {
+            if (err) {
+                throw err;
+            }
         });
     });
+});
+
+function filterGoods(url, html) {
+    var $ = cheerio.load(html);
+    var name = $('#name').find('h1').text();
+    return {
+        'url': url,
+        'name': name
+    };
 }
