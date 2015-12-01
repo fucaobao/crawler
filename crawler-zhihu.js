@@ -1,12 +1,13 @@
 var http = require("http");
 var fs = require("fs");
+var zhihu = require('./models/dao.js');
 var superagent = require('superagent');
 var cheerio = require("cheerio");
 var async = require('async'); //可控制并发数量
 // var iconv = require('iconv-lite');//字符编码转换
 var filename = './zhihu/contents-zhihu';
 var urls = []; //话题数量
-for (var index = 19621319, max = 19631319; index <= max; index++) {
+for (var index = 19621319, max = 19622319; index <= max; index++) {
     urls.push('http://www.zhihu.com/topic/' + index + '/questions');
 }
 async.mapLimit(urls, 50, function(url, callback) {
@@ -59,22 +60,31 @@ function filterContents(html, index) {
         return;
     }
     var $ = cheerio.load(html);
-    var titles = $('.question-item-title')
-    var contents = [];
+    var titles = $('.question-item-title');
+    var contents = [],
+        tmpObj;
     for (var i = 0, len = titles.length; i < len; i++) {
         var $selector = $(titles[i]);
         var time = $selector.find('span').text();
         var title = $selector.find('a').text();
         var href = $selector.find('a').attr('href');
-        contents.push(JSON.stringify({
+        tmpObj = {
             'time': time,
             'title': title,
-            'href': href
-        }) + ',');
+            'href': 'http://www.zhihu.com' + href
+        };
+        contents.push(tmpObj);
+        zhihu.save(tmpObj, function(err) {
+            if (err) {
+                console.log('failure');
+            } else {
+                console.log('success');
+            }
+        });
     }
-    fs.appendFile(filename + '-' + index + '.json', contents.join(''), function(err) {
-        if (err) {
-            throw err;
-        }
-    });
+    // fs.appendFile(filename + '-' + index + '.json', contents.join(''), function(err) {
+    //     if (err) {
+    //         throw err;
+    //     }
+    // });
 }
