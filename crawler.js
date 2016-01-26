@@ -33,7 +33,7 @@ function writeToFile() {
     contents.forEach(function(item, index) {
         item.index = index + 1;
     });
-    fs.appendFile(filename, JSON.stringify(contents), function(err) {
+    fs.appendFile(filename, JSON.stringify(contents, null, 4), function(err) {
         if (err) {
             throw err;
         }

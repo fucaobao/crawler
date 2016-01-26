@@ -1,0 +1,32 @@
+{
+  "name": "crawler",
+  "version": "1.0.0",
+  "description": "nodejs crawler practice",
+  "main": "crawler.js",
+  "dependencies": {
+    "async": "^1.5.0",
+    "cheerio": "^0.19.0",
+    "eventproxy": "^0.3.4",
+    "iconv-lite": "^0.4.13",
+    "mongoose": "^4.2.8",
+    "superagent": "^1.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fucaobao/crawler.git"
+  },
+  "keywords": [
+    "nodejs",
+    "crawler"
+  ],
+  "author": "fucaobao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fucaobao/crawler/issues"
+  },
+  "homepage": "https://github.com/fucaobao/crawler#readme"
+}
