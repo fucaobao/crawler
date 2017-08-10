@@ -10,7 +10,6 @@ var contents = [];
 var filename = 'contents.json';
 var urls = [];
 var concurrencyCount = 0;
-var concurrencyCount = 0;
 for (var index = 0, max = 10; index < max; index++) {
     urls.push('http://movie.douban.com/top250?start=' + 25 * index);
 }
